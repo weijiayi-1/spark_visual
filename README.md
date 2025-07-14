@@ -28,7 +28,8 @@
 
 ---
 **效果展示**
-![Uploading image.png…]()
+<img width="1085" height="745" alt="image" src="https://github.com/user-attachments/assets/dc1ad21a-1cac-4115-9003-7f1cdbb1906c" />
+
 
 # 第一章：项目背景与目标
 
