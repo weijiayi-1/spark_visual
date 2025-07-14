@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二手房数据可视化大屏</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts-wordcloud@2.0.0/dist/echarts-wordcloud.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #e0e6ed;
+            font-family: 'Segoe UI', 'Arial', 'sans-serif';
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background: rgba(20, 30, 48, 0.85);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            padding: 32px 24px;
+            margin-top: 32px;
+            max-width: 1700px;
+        }
+        .dashboard-title {
+            margin-bottom: 30px;
+            position: relative;
+            left: -90px;
+            font-size: 2.6rem;
+            font-family: 'Segoe UI', 'Arial', 'sans-serif';
+            background: linear-gradient(90deg, #00ffe7 10%, #3a8dde 50%, #0fffc1 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            text-shadow: 0 0 12px #00ffe7, 0 0 24px #3a8dde, 0 0 32px #0fffc1;
+            letter-spacing: 3px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .charts-flex {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+        }
+        .charts-left {
+            display: flex;
+            flex-direction: column;
+        }
+        .charts-right {
+            display: flex;
+            flex-direction: column;
+            margin-left: 20px;
+        }
+        .charts-right-top {
+            display: flex;
+            flex-direction: row;
+        }
+        #barChart, #cityBarChart, #bar3dChart, #map3dChart, #huxinRadarChart, #huxinPieChart, #wordCloudChart, #yearLineChart {
+            border: 2px solid #00ffe7;
+            border-radius: 16px;
+            box-shadow: 0 0 16px #00ffe744, 0 0 32px #3a8dde33;
+            padding: 12px 8px;
+            background: rgba(10, 20, 40, 0.5);
+        }
+        #barChart, #cityBarChart {
+            width: 400px;
+            height: 300px;
+            margin-bottom: 0;
+        }
+        #cityBarChart {
+            margin-top: 0;
+        }
+        #bar3dChart {
+            width: 700px;
+            height: 300px;
+            margin-top: 20px;
+        }
+        #map3dChart {
+            width: 700px;
+            height: 600px;
+            margin: 0 20px;
+        }
+        #huxinRadarChart {
+            width: 200px;
+            height: 200px;
+            margin-right: 10px;
+        }
+        #huxinPieChart {
+            width: 200px;
+            height: 200px;
+        }
+        #wordCloudChart {
+            width: 400px;
+            height: 400px;
+            margin-top: 10px;
+        }
+        #yearLineChart {
+            width: 800px;
+            height: 300px;
+            margin-right: 0;
+        }
+        .charts-bottom {
+            display: flex;
+            flex-direction: row;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .charts-bottom > div {
+            flex: 1 1 0;
+            min-width: 300px;
+            height: 400px;
+        }
+        .charts-bottom > div:first-child {
+            flex: 1.3 1 0;
+            min-width: 300px;
+            height: 400px;
+            margin-right: 20px;
+        }
+        .charts-bottom > div:last-child {
+            flex: 0.7 1 0;
+            min-width: 300px;
+            height: 400px;
+            margin-right: 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #d32f2f;
+            background-color: #ffebee;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="dashboard-title">二手房数据可视化大屏</div>
+        <div class="charts-flex">
+            <div class="charts-left">
+                <div id="barChart" class="chart-container">
+                    <div class="loading">正在加载柱状图数据...</div>
+                </div>
+                <div id="cityBarChart" class="chart-container">
+                    <div class="loading">正在加载城市均价柱状图数据...</div>
+                </div>
+            </div>
+            <div id="map3dChart" class="chart-container">
+                <div class="loading">正在加载3D地图数据...</div>
+            </div>
+            <div class="charts-right">
+                <div class="charts-right-top">
+                    <div id="huxinRadarChart" class="chart-container">
+                        <div class="loading">正在加载户型雷达图数据...</div>
+                    </div>
+                    <div id="huxinPieChart" class="chart-container">
+                        <div class="loading">正在加载户型饼图数据...</div>
+                    </div>
+                </div>
+                <div id="wordCloudChart" class="chart-container">
+                    <div class="loading">正在加载词云图数据...</div>
+                </div>
+            </div>
+        </div>
+        <div class="charts-bottom">
+            <div id="bar3dChart" class="chart-container" style="margin-right: 20px;">
+                <div class="loading">正在加载3D条形图数据...</div>
+            </div>
+            <div id="yearLineChart" class="chart-container"></div>
+        </div>
+    </div>
+    <script>
+        function loadCharts() {
+            fetch('/charts/data/')
+                .then(response => response.json())
+                .then(data => {
+                    echarts.init(document.getElementById('barChart')).setOption(eval('(' + data.bar_chart_data + ')'));
+                    // 拉取广西geojson并注册地图后再渲染3D地图
+                    fetch('https://geo.datav.aliyun.com/areas_v3/bound/450000_full.json')
+                        .then(res => res.json())
+                        .then(geoJson => {
+                            echarts.registerMap('广西', geoJson);
+                            echarts.init(document.getElementById('map3dChart')).setOption(eval('(' + data.map3d_chart_data + ')'));
+                        })
+                        .catch(err => {
+                            document.getElementById('map3dChart').innerHTML = '<div class="error">广西地图geojson加载失败</div>';
+                        });
+                    echarts.init(document.getElementById('bar3dChart')).setOption(eval('(' + data.bar3d_chart_data + ')'));
+                    echarts.init(document.getElementById('cityBarChart')).setOption(eval('(' + data.city_bar_chart_data + ')'));
+                    echarts.init(document.getElementById('huxinRadarChart')).setOption(eval('(' + data.huxin_radar_chart_data + ')'));
+                    echarts.init(document.getElementById('huxinPieChart')).setOption(eval('(' + data.huxin_pie_chart_data + ')'));
+                    echarts.init(document.getElementById('wordCloudChart')).setOption(eval('(' + data.wordcloud_chart_data + ')'));
+                    echarts.init(document.getElementById('yearLineChart')).setOption(eval('(' + data.year_line_chart_data + ')'));
+                });
+        }
+        document.addEventListener('DOMContentLoaded', loadCharts);
+    </script>
+</body>
+</html> 
