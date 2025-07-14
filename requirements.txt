@@ -1,0 +1,5 @@
+django
+pymysql
+pyecharts
+pyspark
+jieba 
